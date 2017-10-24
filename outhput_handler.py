@@ -1,4 +1,4 @@
-from core import is_empty, cons, car, cdr, ConsList, EmptyList, get_type, get_value, BinOp
+from core import is_empty, car, cdr, get_type, get_value
 
 
 def show(l):
