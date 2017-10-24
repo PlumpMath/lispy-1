@@ -10,6 +10,10 @@ def test():
     l5 = cons(BinOp('+'), cons(7, cons(4, EmptyList())))
     l6 = cons(BinOp('-'), cons(7, cons(4, EmptyList())))
     l7 = cons(BinOp('*'), cons(7, cons(4, EmptyList())))
+    l8 = cons(BinOp('/'), cons(10, cons(2, EmptyList())))
+    l9 = cons(BinOp('%'), cons(7, cons(4, EmptyList())))
+
+    l10 = cons(BinOp('*'), cons(10, cons(cons(BinOp('+'), cons(2, cons(3, EmptyList()))), EmptyList())))
 
     assert show(l1) == '(1 2)', 'l1 Not passed'
     assert show(l2) == '(1 ())', 'l2 Not passed'
@@ -19,6 +23,12 @@ def test():
 
     assert eval_lisp(l6) == 3, 'l6 Not passed'
     assert eval_lisp(l7) == 28, 'l7 Not passed'
+    assert eval_lisp(l8) == 5, 'l8 Not passed'
+    assert eval_lisp(l9) == 3, 'l9 Not passed'
+
+    assert eval_lisp(l10) == 50, 'l10 Not passed'
+
+    print('all tests passed')
 
 test()
 
