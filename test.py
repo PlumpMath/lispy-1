@@ -1,8 +1,10 @@
-from core import cons, EmptyList, BinOp
+from core import cons, EmptyList, BinOp, Env, set_env, get_env, SpecialForm, Symbol
 from outhput_handler import show, eval_lisp
 
 
-def test():
+def test_core():
+    e = Env()
+
     l1 = cons(1, 2)
     l2 = cons(1, EmptyList())
     l3 = cons(cons(1, 2), cons(3, 4))
@@ -21,15 +23,23 @@ def test():
     assert show(l4) == '(1 (2 ()))', 'l4 Not passed'
     assert show(l5) == '(+ (7 (4 ())))', 'l5 Not passed'
 
-    assert eval_lisp(l6) == 3, 'l6 Not passed'
-    assert eval_lisp(l7) == 28, 'l7 Not passed'
-    assert eval_lisp(l8) == 5, 'l8 Not passed'
-    assert eval_lisp(l9) == 3, 'l9 Not passed'
+    assert eval_lisp(l6, e) == 3, 'l6 Not passed'
+    assert eval_lisp(l7, e) == 28, 'l7 Not passed'
+    assert eval_lisp(l8, e) == 5, 'l8 Not passed'
+    assert eval_lisp(l9, e) == 3, 'l9 Not passed'
 
-    assert eval_lisp(l10) == 50, 'l10 Not passed'
+    assert eval_lisp(l10, e) == 50, 'l10 Not passed'
 
-    print('all tests passed')
-
-test()
+    print('core tests passed')
 
 
+def env_test():
+    e = Env()
+
+    eval_lisp(cons(SpecialForm('def'), cons(Symbol('a'), cons(3, EmptyList()))), e)
+    assert eval_lisp(cons(BinOp('*'), cons(Symbol('a'), cons(10, EmptyList()))), e) == 30, 'e1 Not passed'
+
+    print('env tests passed')
+
+# test_core()
+env_test()

@@ -71,6 +71,9 @@ class Symbol:
     def get_value(self):
         return self.val
 
+    def get_type(self):
+        return self.type
+
 
 class BinOp:
     def __init__(self, op):
@@ -82,3 +85,37 @@ class BinOp:
 
     def get_value(self):
         return self.op
+
+
+class Env:
+    def __init__(self, vals_dict=None, parent=None):
+        self.values = vals_dict or {}
+        self.parent = parent
+
+
+def set_env(e, k, v):
+    e.values[k] = v
+
+
+def get_env(e, k):
+    if e is None:
+        return k
+    if k in e.values:
+        return e.values[k]
+    return get_env(e.parent, k)
+
+
+def def_env(p):
+    return Env(parent=p)
+
+
+class SpecialForm:
+    def __init__(self, v):
+        self.value = v
+        self.type = 'SpecialForm'
+
+    def get_value(self):
+        return self.value
+
+    def get_type(self):
+        return self.type
