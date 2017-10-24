@@ -18,7 +18,7 @@ def check_brackets(string):
 
 def pinch_block(string):
     if not check_brackets(string):
-        return 0
+        return Exception('Incorrect brackets!')
 
     stack = []
     result = 0

@@ -10,26 +10,40 @@ def cdr(l):
     return l.cdr()
 
 
-def is_list_empty(l):
+def is_empty(l):
     if l.car() is None and l.cdr() is None:
         return True
     return False
 
 
-def li(v):
-    return cons(v, EmptyList())
+def get_type(o):
+    try:
+        return o.get_type()
+    except:
+        return type(o)
+
+
+def get_value(o):
+    try:
+        return o.get_value()
+    except:
+        return o
 
 
 class ConsList:
     def __init__(self, v1, v2):
         self.v1 = v1
         self.v2 = v2
+        self.type = 'ConsList'
 
     def car(self):
         return self.v1
 
     def cdr(self):
         return self.v2
+
+    def get_type(self):
+        return self.type
 
 
 class EmptyList:
@@ -47,3 +61,24 @@ class EmptyList:
 
     def __repr__(self):
         return 'empty list.'
+
+
+class Symbol:
+    def __init__(self, v):
+        self.val = v
+        self.type = 'Symbol'
+
+    def get_value(self):
+        return self.val
+
+
+class BinOp:
+    def __init__(self, op):
+        self.op = op
+        self.type = 'BinOp'
+
+    def get_type(self):
+        return self.type
+
+    def get_value(self):
+        return self.op
