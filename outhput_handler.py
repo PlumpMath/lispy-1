@@ -1,4 +1,4 @@
-from core import is_empty, car, cdr, get_type, get_value, get_env, set_env
+from core import is_empty, car, cdr, get_type, get_value, get_env, set_env, def_env
 
 
 def show(l):
@@ -8,6 +8,8 @@ def show(l):
         if is_empty(l):
             return '()'
         return "({} {})".format(show(car(l)), show(cdr(l)))
+    if type == "<class 'str'>":
+        return '"{}"'.format(l)
     return get_value(l)
 
 
@@ -48,7 +50,7 @@ def eval_special_form(h, l, e):
     if get_value(h) == 'def':
         k = eval_lisp(car(l), e)
         v = eval_lisp(cdr(l), e)
-        set_env(e, k, v)
+        def_env(e, k, v)
 
 
 def eval_lisp(l, e):
@@ -64,8 +66,8 @@ def eval_lisp(l, e):
         if head_form_type == 'SpecialForm':
             return eval_special_form(head_form, cdr(l), e)
         if head_form_type == 'Symbol':
-            return get_env(e, get_value(head_form))
+            return get_env(e, head_form)
         return head_form
     if type == 'Symbol':
-        return get_env(e, get_value(l))
+        return get_env(e, l)
     return l

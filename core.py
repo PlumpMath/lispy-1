@@ -20,7 +20,7 @@ def get_type(o):
     try:
         return o.get_type()
     except:
-        return type(o)
+        return str(type(o))
 
 
 def get_value(o):
@@ -94,19 +94,27 @@ class Env:
 
 
 def set_env(e, k, v):
-    e.values[k] = v
+    if e is None:
+        return
+
+    if k in e.values:
+        e.values[k] = v
+    else:
+        set_env(e.parent, k, v)
 
 
 def get_env(e, k):
     if e is None:
-        return k
-    if k in e.values:
-        return e.values[k]
+        return get_value(k)
+    if get_value(k) in e.values:
+        return e.values[get_value(k)]
     return get_env(e.parent, k)
 
 
-def def_env(p):
-    return Env(parent=p)
+def def_env(e, k, v):
+    if e is None:
+        return
+    e.values[k] = v
 
 
 class SpecialForm:

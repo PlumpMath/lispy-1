@@ -17,6 +17,9 @@ def test_core():
 
     l10 = cons(BinOp('*'), cons(10, cons(cons(BinOp('+'), cons(2, cons(3, EmptyList()))), EmptyList())))
 
+    l11 = cons(SpecialForm('def'), cons(Symbol('a'), cons(3, EmptyList())))
+    l12 = cons(SpecialForm('def'), cons(Symbol('a'), cons('asd', EmptyList())))
+
     assert show(l1) == '(1 2)', 'l1 Not passed'
     assert show(l2) == '(1 ())', 'l2 Not passed'
     assert show(l3) == '((1 2) (3 4))', 'l3 Not passed'
@@ -30,6 +33,9 @@ def test_core():
 
     assert eval_lisp(l10, e) == 50, 'l10 Not passed'
 
+    assert show(l11) == '(def (a (3 ())))', 'l11 Not passed'
+    assert show(l12) == '(def (a ("asd" ())))', 'l12 Not passed'
+
     print('core tests passed')
 
 
@@ -41,5 +47,6 @@ def env_test():
 
     print('env tests passed')
 
-# test_core()
+
+test_core()
 env_test()
