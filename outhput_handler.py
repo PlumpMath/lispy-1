@@ -1,13 +1,19 @@
 from core import is_empty, car, cdr, get_type, get_value, get_env, set_env, def_env
 
 
-def show(l):
+def show(l, start_of_list=True):
     type = get_type(l)
+    new_list = True
 
     if type == 'ConsList':
         if is_empty(l):
             return '()'
-        return "({} {})".format(show(car(l)), show(cdr(l)))
+        if get_type(car(l)) != 'ConsList':
+            new_list = False
+        if start_of_list:
+            return "({} {})".format(show(car(l)), show(cdr(l), new_list))
+        else:
+            return "{} {}".format(show(car(l)), show(cdr(l), new_list))
     if type == "<class 'str'>":
         return '"{}"'.format(l)
     return get_value(l)
@@ -26,7 +32,7 @@ def realize_bin_op(op, l, r):
     elif op == '%':
         result = l % r
     else:
-        raise Exception('Wtf is this operator???')
+        raise Exception('Wtf is this bin operator???')
 
     return result
 
@@ -40,6 +46,33 @@ def eval_bin_op(h, l, e):
         right_operand = eval_lisp(car(l), e)
         result = realize_bin_op(get_value(h), result, right_operand)
         l = cdr(l)
+    return result
+
+
+def realize_pred_op(op, l, r):
+    result = False
+    if op == '<':
+        result = l < r
+    elif op == '<=':
+        result = l <= r
+    elif op == '>':
+        result = l >= r
+    elif op == '==':
+        result = l == r
+    elif op == '!=':
+        result = l != r
+    else:
+        raise Exception('Wtf is this pred operator???')
+
+    return result
+
+
+def eval_pred_op(h, l, e):
+    if is_empty(l):
+        return None
+    left_operand = eval_lisp(car(l), e)
+    right_operand = eval_lisp(cdr(l), e)
+    result = realize_pred_op(get_value(h), left_operand, right_operand)
     return result
 
 
@@ -63,6 +96,8 @@ def eval_lisp(l, e):
         head_form_type = get_type(head_form)
         if head_form_type == 'BinOp':
             return eval_bin_op(head_form, cdr(l), e)
+        if head_form_type == 'PredOp':
+            return eval_pred_op(head_form, cdr(l), e)
         if head_form_type == 'SpecialForm':
             return eval_special_form(head_form, cdr(l), e)
         if head_form_type == 'Symbol':

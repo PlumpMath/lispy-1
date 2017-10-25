@@ -1,3 +1,15 @@
+class LispyCore:
+    def __init__(self, v):
+        self.type = None
+        self.value = v
+
+    def get_value(self):
+        return self.value
+
+    def get_type(self):
+        return self.type
+
+
 def cons(v1, v2):
     return ConsList(v1, v2)
 
@@ -63,28 +75,22 @@ class EmptyList:
         return 'empty list.'
 
 
-class Symbol:
+class Symbol(LispyCore):
     def __init__(self, v):
-        self.val = v
+        super().__init__(v)
         self.type = 'Symbol'
 
-    def get_value(self):
-        return self.val
 
-    def get_type(self):
-        return self.type
+class PredOp(LispyCore):
+    def __init__(self, v):
+        super().__init__(v)
+        self.type = 'PredOp'
 
 
-class BinOp:
-    def __init__(self, op):
-        self.op = op
+class BinOp(LispyCore):
+    def __init__(self, v):
+        super().__init__(v)
         self.type = 'BinOp'
-
-    def get_type(self):
-        return self.type
-
-    def get_value(self):
-        return self.op
 
 
 class Env:
@@ -117,13 +123,7 @@ def def_env(e, k, v):
     e.values[k] = v
 
 
-class SpecialForm:
+class SpecialForm(LispyCore):
     def __init__(self, v):
-        self.value = v
+        super().__init__(v)
         self.type = 'SpecialForm'
-
-    def get_value(self):
-        return self.value
-
-    def get_type(self):
-        return self.type
