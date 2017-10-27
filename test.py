@@ -55,16 +55,18 @@ def env_test():
 
 
 def inp_test():
+    p1 = parse('1 2')
+    print(show(p1))
     p1 = parse('(1 2)')
     print(show(p1))
-    p3 = parse('(1 2 3 4)')
-    print(show(p3))
-    p4 = parse('(1 2)(3 4)')
-    print(show(p4))
-    p5 = parse('((1 2)(3 4))')
-    print(show(p5))
+    p1 = parse('(1 2 3 4)')
+    print(show(p1))
+    p1 = parse('((1 2) (3 4))')
+    print(show(p1))
+    p1 = parse('(1 2) (3 4)')
+    print(show(p1))
 
 
-test_core()
-env_test()
-# inp_test()
+#test_core()
+#env_test()
+inp_test()
