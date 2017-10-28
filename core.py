@@ -123,7 +123,20 @@ def def_env(e, k, v):
     e.values[k] = v
 
 
+def sub_env(e):
+    return Env(parent=e)
+
+
 class SpecialForm(LispyCore):
     def __init__(self, v):
         super().__init__(v)
         self.type = 'SpecialForm'
+
+
+class Lambda(LispyCore):
+    def __init__(self, args, body, env):
+        super().__init__(None)
+        self.args = args
+        self.body = body
+        self.env = env
+        self.type = 'Lambda'

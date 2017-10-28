@@ -21,6 +21,12 @@ def test_core():
     l11 = cons(SpecialForm('def'), cons(Symbol('a'), cons(3, EmptyList())))
     l12 = cons(SpecialForm('def'), cons(Symbol('a'), cons('asd', EmptyList())))
 
+    l13 = cons(1, cons(cons(1, cons(2, EmptyList())), EmptyList()))
+    print(show(l13))
+
+    l14 = cons(BinOp('+'), cons(cons(BinOp('+'), cons(2, cons(3, EmptyList()))), cons(3, EmptyList())))
+    print('l14', show(l14))
+
     assert show(l1) == '(1 2)', 'l1 Not passed'
     assert show(l2) == '(1 ())', 'l2 Not passed'
     assert show(l3) == '((1 2) (3 4))', 'l3 Not passed'
@@ -38,9 +44,17 @@ def test_core():
     assert show(l12) == '(def a "asd" ())', 'l12 Not passed'
 
     pre1 = cons(PredOp('>'), cons(1, cons(2, EmptyList())))
+    pre2 = cons(PredOp('>'), cons(1, cons(2, cons(3, EmptyList()))))
+    pre3 = cons(PredOp('>'), cons(2, cons(1, cons(3, EmptyList()))))
 
     assert show(pre1) == '(> 1 2 ())', 'pre1 Not passed!'
     assert not eval_lisp(pre1, e), 'pre1 Not Accepted!'
+
+    assert show(pre2) == '(> 1 2 3 ())', 'pre2 Not passed!'
+    assert not eval_lisp(pre2, e), 'pre2 Not Accepted!'
+
+    assert show(pre3) == '(> 2 1 3 ())', 'pre3 Not passed!'
+    assert not eval_lisp(pre3, e), 'pre3 Not Accepted!'
 
     print('core tests passed')
 
@@ -55,18 +69,54 @@ def env_test():
 
 
 def inp_test():
+    e = Env()
     p1 = parse('1 2')
     print(show(p1))
     p1 = parse('(1 2)')
     print(show(p1))
+    p1 = parse('(+ 1 2)')
+    print(show(p1))
     p1 = parse('(1 2 3 4)')
     print(show(p1))
-    p1 = parse('((1 2) (3 4))')
+    p1 = parse('(+ (+ 3 2) 3)')
+    print(eval_lisp(p1, e))
     print(show(p1))
-    p1 = parse('(1 2) (3 4)')
+    p1 = parse('(1 (4 5))')
+    print(show(p1))
+    p1 = parse('(1 2) (3 4) (5 6)')
+    print(show(p1))
+
+    p1 = parse('((def a 10) (+ 1 a))')
+    print(eval_lisp(p1, e))
+
+    p1 = parse('(def a (lambda (x) (* x x)))')
     print(show(p1))
 
 
-#test_core()
-#env_test()
-inp_test()
+def test_lambda():
+    e = Env()
+    l1 = cons(SpecialForm('def'), cons(Symbol('a'), cons(
+        cons(SpecialForm('lambda'),
+             cons(cons(Symbol('x'), EmptyList()), cons(cons(BinOp('*'), cons(Symbol('x'), cons(Symbol('x'), EmptyList()))), EmptyList())))
+        , EmptyList())))
+
+    l2 = cons(Symbol('a'), cons(10, EmptyList()))
+    print(eval_lisp(l1, e))
+    print(eval_lisp(l2, e))
+
+
+# test_lambda()
+# test_core()
+# env_test()
+# inp_test()
+
+
+# (* a (+ (+ 1 2) 2) (+ 2 (+ 1 2)))
+# (def a 10)
+e = Env()
+print('go')
+n = input()
+while len(n) != 0:
+    print(eval_lisp(parse(n), e))
+    n = input()
+

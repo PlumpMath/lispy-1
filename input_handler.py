@@ -1,4 +1,8 @@
-from core import cons, Symbol, EmptyList
+from core import cons, Symbol, EmptyList, BinOp, PredOp, SpecialForm
+
+bin_ops = {'+', '-', '*', '/', '%'}
+pred_ops = {'<', '<=', '>', '>=', '==', '!='}
+spec_forms = {'def'}
 
 
 def check_brackets(string):
@@ -50,17 +54,6 @@ def find_cdr(string):
             in_inner_block -= 1
         if val == ' ' and in_inner_block <= 0:
             return i
-
-    # br_stack = []
-    # for i, val in enumerate(string):
-    #     if val == '(':
-    #         br_stack.append(val)
-    #     if val == ')':
-    #         if len(br_stack) == 0:
-    #             return -1
-    #         br_stack.pop()
-    #     if val == ' ' and (len(br_stack) == 1 or len(br_stack) == 0):
-    #         return i
     return -1
 
 
@@ -69,30 +62,73 @@ def trim_brackets(string):
 
 
 def tokenize(string):
-    return string
+    if string.isnumeric():
+        return int(string)
+    elif string in bin_ops:
+        return BinOp(string)
+    elif string in pred_ops:
+        return PredOp(string)
+    elif string in spec_forms:
+        return SpecialForm(string)
+    elif string[0] == '"':
+        return string
+    elif string[0].isalpha():
+        return Symbol(string)
+    else:
+        return float(string)
 
 
-def parse(string):
+# def parse(string):
+#     string = string.strip()
+#     if len(string) == 0:
+#         return EmptyList()
+#     elif string[0] == '(':
+#         pinch_ind = pinch_block(string)
+#         if pinch_ind == len(string):
+#             return cons(parse(string[1:-1]), EmptyList())
+#             #return parse(string[1:-1])
+#         else:
+#             cdr_ind = find_cdr(string)
+#             car_tok = parse(string[:cdr_ind])
+#             cdr_tok = parse(string[cdr_ind:])
+#             return cons(car_tok, cdr_tok)
+#     else:
+#         cdr_ind = find_cdr(string)
+#         if cdr_ind != -1:
+#             car_tok = tokenize(string[:cdr_ind])
+#             cdr_tok = parse(string[cdr_ind:])
+#             return cons(car_tok, cdr_tok)
+#         else:
+#             car_tok = tokenize(string)
+#             cdr_tok = EmptyList()
+#             return cons(car_tok, cdr_tok)
+
+
+def parse(string, level=0):
     string = string.strip()
-    if len(string) == 0:
+    length = len(string)
+    if length == 0:
         return EmptyList()
-    elif string[0] == '(':
+    if string[0] == '(':
         pinch_ind = pinch_block(string)
-        if pinch_ind == len(string):
-            return parse(string[1:-1])
+        if length == pinch_ind:
+            if level == 0:
+                return parse(string[1:-1], level=1)
+            else:
+                car_tok = parse(string[1:-1], level + 1)
+                return cons(car_tok, EmptyList())
         else:
             cdr_ind = find_cdr(string)
-            car_tok = parse(string[:cdr_ind])
-            cdr_tok = parse(string[cdr_ind:])
+            car_tok = parse(string[1:cdr_ind - 1], level + 1)
+            cdr_tok = parse(string[cdr_ind:], level=level)
             return cons(car_tok, cdr_tok)
     else:
         cdr_ind = find_cdr(string)
         if cdr_ind != -1:
             car_tok = tokenize(string[:cdr_ind])
-            cdr_tok = parse(string[cdr_ind:])
+            cdr_tok = parse(string[cdr_ind:], level)
             return cons(car_tok, cdr_tok)
         else:
             car_tok = tokenize(string)
             cdr_tok = EmptyList()
             return cons(car_tok, cdr_tok)
-

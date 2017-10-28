@@ -1,4 +1,4 @@
-from core import is_empty, car, cdr, get_type, get_value, get_env, set_env, def_env
+from core import is_empty, car, cdr, get_type, get_value, get_env, set_env, def_env, sub_env, Lambda
 
 
 def show(l, start_of_list=True):
@@ -13,7 +13,7 @@ def show(l, start_of_list=True):
         if start_of_list:
             return "({} {})".format(show(car(l)), show(cdr(l), new_list))
         else:
-            return "{} {}".format(show(car(l)), show(cdr(l), new_list))
+            return "{} {}".format(show(car(l)), show(cdr(l), False))
     if type == "<class 'str'>":
         return '"{}"'.format(l)
     return get_value(l)
@@ -70,20 +70,49 @@ def realize_pred_op(op, l, r):
 def eval_pred_op(h, l, e):
     if is_empty(l):
         return None
+
     left_operand = eval_lisp(car(l), e)
-    right_operand = eval_lisp(cdr(l), e)
-    result = realize_pred_op(get_value(h), left_operand, right_operand)
-    return result
+    l = cdr(l)
+    result = True
+    while not is_empty(l):
+        right_operand = eval_lisp(car(l), e)
+        result = result and realize_pred_op(get_value(h), left_operand, right_operand)
+        if not result:
+            return False
+        left_operand = right_operand
+        l = cdr(l)
+    return True
 
 
 def eval_special_form(h, l, e):
     if is_empty(l):
         return None
-
-    if get_value(h) == 'def':
+    val = get_value(h)
+    if val == 'def':
         k = eval_lisp(car(l), e)
-        v = eval_lisp(cdr(l), e)
+        v = eval_lisp(car(cdr(l)), e)
         def_env(e, k, v)
+    elif val == 'lambda':
+        args = car(l)
+        body = cdr(l)
+        return Lambda(args, body, e)
+    return 'OK'
+
+
+def eval_lambda(head_form, args, e):
+    su = head_form.env
+    sub_args = head_form.args
+    while not is_empty(sub_args):
+        if is_empty(args):
+            raise Exception('not enough args!')
+        arg = eval_lisp(car(args), e)
+        def_env(su, eval_lisp(car(sub_args), e), arg)
+        sub_args = cdr(sub_args)
+        args = cdr(args)
+    body = head_form.body
+    return eval_lisp(body, su)
+
+
 
 
 def eval_lisp(l, e):
@@ -102,6 +131,8 @@ def eval_lisp(l, e):
             return eval_special_form(head_form, cdr(l), e)
         if head_form_type == 'Symbol':
             return get_env(e, head_form)
+        if head_form_type == 'Lambda':
+            return eval_lambda(head_form, cdr(l), e)
         return head_form
     if type == 'Symbol':
         return get_env(e, l)
