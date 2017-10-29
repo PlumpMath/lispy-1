@@ -1,3 +1,5 @@
+import re
+
 from core import cons, EmptyList, BinOp, Env, set_env, get_env, SpecialForm, Symbol, PredOp
 from input_handler import parse
 from outhput_handler import show, eval_lisp
@@ -46,9 +48,12 @@ def test_core():
     pre1 = cons(PredOp('>'), cons(1, cons(2, EmptyList())))
     pre2 = cons(PredOp('>'), cons(1, cons(2, cons(3, EmptyList()))))
     pre3 = cons(PredOp('>'), cons(2, cons(1, cons(3, EmptyList()))))
+    pre4 = cons(PredOp('and'), cons(cons(PredOp('>'), cons(6, cons(2, EmptyList()))), cons(pre1, EmptyList())))
 
     assert show(pre1) == '(> 1 2 ())', 'pre1 Not passed!'
     assert not eval_lisp(pre1, e), 'pre1 Not Accepted!'
+    print(show(pre4))
+    print(eval_lisp(pre4, e))
 
     assert show(pre2) == '(> 1 2 3 ())', 'pre2 Not passed!'
     assert not eval_lisp(pre2, e), 'pre2 Not Accepted!'
@@ -97,7 +102,8 @@ def test_lambda():
     e = Env()
     l1 = cons(SpecialForm('def'), cons(Symbol('a'), cons(
         cons(SpecialForm('lambda'),
-             cons(cons(Symbol('x'), EmptyList()), cons(cons(BinOp('*'), cons(Symbol('x'), cons(Symbol('x'), EmptyList()))), EmptyList())))
+             cons(cons(Symbol('x'), EmptyList()),
+                  cons(cons(BinOp('*'), cons(Symbol('x'), cons(Symbol('x'), EmptyList()))), EmptyList())))
         , EmptyList())))
 
     l2 = cons(Symbol('a'), cons(10, EmptyList()))
@@ -105,18 +111,37 @@ def test_lambda():
     print(eval_lisp(l2, e))
 
 
+def test_if():
+    if1 = cons(SpecialForm('if'), cons(cons(PredOp('<'), cons(3,
+                                                              cons(5, EmptyList()))), cons(cons(88, EmptyList()),
+                                                                                           cons(cons(22, EmptyList()),
+                                                                                                EmptyList()))))
+    print(show(if1))
+    print(eval_lisp(parse('(if (< 3 5) (12) (22))'), Env()))
+
+
+def test_fib():
+    e = Env()
+    fib = parse('(def fib (lambda (n) (if (< n 2) 1 (+ (fib (- n 1)) (fib (- n 2))))))')
+    print(show(fib))
+    eval_lisp(fib, e)
+    exec_fib = parse('(fib 30)')
+    print(eval_lisp(exec_fib, e))
+
+
+test_fib()
 # test_lambda()
 # test_core()
 # env_test()
 # inp_test()
+# test_if()
 
 
 # (* a (+ (+ 1 2) 2) (+ 2 (+ 1 2)))
 # (def a 10)
-e = Env()
-print('go')
-n = input()
-while len(n) != 0:
-    print(eval_lisp(parse(n), e))
-    n = input()
-
+# e = Env()
+# print('go')
+# n = re.sub(r"\s", ' ', input())
+# while len(n) != 0:
+#     print(eval_lisp(parse(n), e))
+#     n = re.sub(r"\s", ' ', input())

@@ -61,6 +61,10 @@ def realize_pred_op(op, l, r):
         result = l == r
     elif op == '!=':
         result = l != r
+    elif op == 'and':
+        result = l and r
+    elif op == 'or':
+        result = l or r
     else:
         raise Exception('Wtf is this pred operator???')
 
@@ -96,23 +100,30 @@ def eval_special_form(h, l, e):
         args = car(l)
         body = cdr(l)
         return Lambda(args, body, e)
+    elif val == 'if':
+        pred = eval_lisp(car(l), e)
+        t = car(cdr(l))
+        f = car(cdr(cdr(l)))
+        if pred:
+            return eval_lisp(t, e)
+        else:
+            return eval_lisp(f, e)
     return 'OK'
 
 
 def eval_lambda(head_form, args, e):
-    su = head_form.env
+    su = sub_env(head_form.env)
     sub_args = head_form.args
     while not is_empty(sub_args):
         if is_empty(args):
             raise Exception('not enough args!')
         arg = eval_lisp(car(args), e)
-        def_env(su, eval_lisp(car(sub_args), e), arg)
+        k = eval_lisp(car(sub_args), su)
+        def_env(su, k, arg)
         sub_args = cdr(sub_args)
         args = cdr(args)
     body = head_form.body
     return eval_lisp(body, su)
-
-
 
 
 def eval_lisp(l, e):

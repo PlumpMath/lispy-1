@@ -1,8 +1,8 @@
 from core import cons, Symbol, EmptyList, BinOp, PredOp, SpecialForm
 
 bin_ops = {'+', '-', '*', '/', '%'}
-pred_ops = {'<', '<=', '>', '>=', '==', '!='}
-spec_forms = {'def'}
+pred_ops = {'<', '<=', '>', '>=', '==', '!=', 'and', 'or'}
+spec_forms = {'def', 'if', 'lambda'}
 
 
 def check_brackets(string):
@@ -76,32 +76,6 @@ def tokenize(string):
         return Symbol(string)
     else:
         return float(string)
-
-
-# def parse(string):
-#     string = string.strip()
-#     if len(string) == 0:
-#         return EmptyList()
-#     elif string[0] == '(':
-#         pinch_ind = pinch_block(string)
-#         if pinch_ind == len(string):
-#             return cons(parse(string[1:-1]), EmptyList())
-#             #return parse(string[1:-1])
-#         else:
-#             cdr_ind = find_cdr(string)
-#             car_tok = parse(string[:cdr_ind])
-#             cdr_tok = parse(string[cdr_ind:])
-#             return cons(car_tok, cdr_tok)
-#     else:
-#         cdr_ind = find_cdr(string)
-#         if cdr_ind != -1:
-#             car_tok = tokenize(string[:cdr_ind])
-#             cdr_tok = parse(string[cdr_ind:])
-#             return cons(car_tok, cdr_tok)
-#         else:
-#             car_tok = tokenize(string)
-#             cdr_tok = EmptyList()
-#             return cons(car_tok, cdr_tok)
 
 
 def parse(string, level=0):
