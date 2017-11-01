@@ -79,51 +79,33 @@ def test_core():
     print('core tests passed')
 
 
-def env_test():
+def input_test():
     e = Env()
 
-    eval_lisp(cons(SpecialForm('def'), cons(Symbol('a'), cons(3, EmptyList()))), e)
-    assert eval_lisp(cons(BinOp('*'), cons(Symbol('a'), cons(10, EmptyList()))), e) == 30, 'e1 Not passed'
+    inp1 = parse('(1 2)')
+    assert show(inp1) == '(1 2 ())'
 
-    print('env tests passed')
+    inp2 = parse('(+ 1 2)')
+    assert show(inp2) == '(+ 1 2 ())'
+    assert eval_lisp(inp2, e) == 3
 
+    inp3 = parse('(1 2 3 4)')
+    assert show(inp3) == '(1 2 3 4 ())'
 
-def inp_test():
-    e = Env()
-    p1 = parse('1 2')
-    print(show(p1))
-    p1 = parse('(1 2)')
-    print(show(p1))
-    p1 = parse('(+ 1 2)')
-    print(show(p1))
-    p1 = parse('(1 2 3 4)')
-    print(show(p1))
-    p1 = parse('(+ (+ 3 2) 3)')
-    print(eval_lisp(p1, e))
-    print(show(p1))
-    p1 = parse('(1 (4 5))')
-    print(show(p1))
-    p1 = parse('(1 2) (3 4) (5 6)')
-    print(show(p1))
+    inp4 = parse('(+ (+ 3 2) 3)')
+    assert eval_lisp(inp4, e) == 8
+    assert show(inp4) == '(+ (+ 3 2 ()) 3 ())'
 
-    p1 = parse('((def a 10) (+ 1 a))')
-    print(eval_lisp(p1, e))
+    inp5 = parse('(1 (4 5))')
+    assert show(inp5) == '(1 (4 5 ()) ())'
 
-    p1 = parse('(def a (lambda (x) (* x x)))')
-    print(show(p1))
+    eval_lisp(parse('(def a 10)'), e)
+    assert eval_lisp(parse('(+ a 3)'), e) == 13
 
+    eval_lisp(parse('(def b (lambda (x) (* x x)))'), e)
+    assert eval_lisp(parse('(b 3)'), e) == 9
 
-def test_lambda():
-    e = Env()
-    l1 = cons(SpecialForm('def'), cons(Symbol('a'), cons(
-        cons(SpecialForm('lambda'),
-             cons(cons(Symbol('x'), EmptyList()),
-                  cons(cons(BinOp('*'), cons(Symbol('x'), cons(Symbol('x'), EmptyList()))), EmptyList())))
-        , EmptyList())))
-
-    l2 = cons(Symbol('a'), cons(10, EmptyList()))
-    print(eval_lisp(l1, e))
-    print(eval_lisp(l2, e))
+    print('input tests passed')
 
 
 def test_if():
@@ -138,25 +120,13 @@ def test_if():
 def test_fib():
     e = Env()
     fib = parse('(def fib (lambda (n) (if (< n 2) 1 (+ (fib (- n 1)) (fib (- n 2))))))')
-    print(show(fib))
+    assert show(fib) == '(def fib (lambda (n ()) (if (< n 2 ()) 1 (+ (fib (- n 1 ()) ()) (fib (- n 2 ()) ()) ()) ()) ()) ())'
     eval_lisp(fib, e)
-    exec_fib = parse('(fib 30)')
-    print(eval_lisp(exec_fib, e))
+    exec_fib = parse('(fib 20)')
+    assert eval_lisp(exec_fib, e) == 10946
 
 
-# test_fib()
-# test_lambda()
+test_fib()
 test_core()
-env_test()
-# inp_test()
-# test_if()
-
-
-# (* a (+ (+ 1 2) 2) (+ 2 (+ 1 2)))
-# (def a 10)
-# e = Env()
-# print('go')
-# n = re.sub(r"\s", ' ', input())
-# while len(n) != 0:
-#     print(eval_lisp(parse(n), e))
-#     n = re.sub(r"\s", ' ', input())
+input_test()
+test_if()
