@@ -67,9 +67,8 @@ def test_core():
     assert eval_lisp(l13, e) == 50, 'eval l13 not passed'
     assert eval_lisp(l14, e) == 'OK', 'eval l14 not passed'
     assert eval_lisp(l15, e) == 3, 'eval l15 not passed'
-    # assert eval_lisp(l16, e) == 'OK', 'eval l16 not passed'    если символ в окружение возвращает его значение
-    # и прикрепляет новое значение к старому значению, а не к самому символу
-    # assert eval_lisp(l17, e) == 'asd', 'eval l17 not passed'
+    assert eval_lisp(l16, e) == 'OK', 'eval l16 not passed'
+    assert eval_lisp(l17, e) == 'asd', 'eval l17 not passed'
     assert eval_lisp(l18, e) == 8, 'eval l18 not passed'
     assert eval_lisp(pre1, e) == False, 'eval pre1 not passed'
     assert eval_lisp(pre2, e) == False, 'eval pre2 not passed'
@@ -120,7 +119,8 @@ def test_if():
 def test_fib():
     e = Env()
     fib = parse('(def fib (lambda (n) (if (< n 2) 1 (+ (fib (- n 1)) (fib (- n 2))))))')
-    assert show(fib) == '(def fib (lambda (n ()) (if (< n 2 ()) 1 (+ (fib (- n 1 ()) ()) (fib (- n 2 ()) ()) ()) ()) ()) ())'
+    assert show(
+        fib) == '(def fib (lambda (n ()) (if (< n 2 ()) 1 (+ (fib (- n 1 ()) ()) (fib (- n 2 ()) ()) ()) ()) ()) ())'
     eval_lisp(fib, e)
     exec_fib = parse('(fib 20)')
     assert eval_lisp(exec_fib, e) == 10946

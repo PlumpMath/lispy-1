@@ -1,4 +1,4 @@
-from core import is_empty, car, cdr, get_type, get_value, get_env, set_env, def_env, sub_env, Lambda
+from core import is_empty, car, cdr, get_type, get_value, get_env, set_env, def_env, sub_env, Lambda, cons
 
 
 def show(l, start_of_list=True):
@@ -93,9 +93,19 @@ def eval_special_form(h, l, e):
         return None
     val = get_value(h)
     if val == 'def':
-        k = eval_lisp(car(l), e)
+        t = get_type(car(l))
+        if t != 'Symbol':
+            raise Exception('Cant assign to {}. Symbol required.'.format(t))
+        k = get_value(car(l))
         v = eval_lisp(car(cdr(l)), e)
         def_env(e, k, v)
+    elif val == 'defn':
+        name = car(l)
+        args = car(cdr(l))
+        body = car(cdr(cdr(l)))
+        k = get_value(name)
+        lmbd = Lambda(args, body, e)
+        def_env(e, k, lmbd)
     elif val == 'lambda':
         args = car(l)
         body = cdr(l)
@@ -108,6 +118,17 @@ def eval_special_form(h, l, e):
             return eval_lisp(t, e)
         else:
             return eval_lisp(f, e)
+    elif val == 'car':
+        h = car(l)
+        return eval_lisp(car(eval_lisp(h, e)), e)
+    elif val == 'cdr':
+        return cdr(car(l))
+    elif val == 'cons':
+        h = eval_lisp(car(l), e)
+        t = eval_lisp(car(cdr(l)), e)
+        return cons(h, t)
+    elif val == 'empty?':
+        return is_empty(car(l))
     return 'OK'
 
 
@@ -126,6 +147,13 @@ def eval_lambda(head_form, args, e):
     return eval_lisp(body, su)
 
 
+def eval_symbol(s, e):
+    t = get_type(s)
+    if t != 'Symbol':
+        raise Exception('{} is not a Symbol'.format(t))
+    return get_env(e, s)
+
+
 def eval_lisp(l, e):
     type = get_type(l)
 
@@ -141,10 +169,12 @@ def eval_lisp(l, e):
         if head_form_type == 'SpecialForm':
             return eval_special_form(head_form, cdr(l), e)
         if head_form_type == 'Symbol':
-            return get_env(e, head_form)
+            return eval_symbol(head_form, e)
         if head_form_type == 'Lambda':
             return eval_lambda(head_form, cdr(l), e)
         return head_form
     if type == 'Symbol':
-        return get_env(e, l)
+        if get_value(l) == 'None':
+            return None
+        return eval_symbol(l, e)
     return l
