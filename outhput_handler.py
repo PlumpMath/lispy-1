@@ -89,6 +89,19 @@ def eval_pred_op(h, l, e):
     return True
 
 
+def eval_cond(l, e):
+    while not is_empty(l):
+        cond = car(l)
+        pred = car(cond)
+        res = car(cdr(cond))
+        if pred == 'else':
+            return eval_lisp(res, e)
+        if eval_lisp(pred, e):
+            return eval_lisp(res, e)
+        l = cdr(l)
+    return None
+
+
 def eval_special_form(h, l, e):
     if is_empty(l):
         return None
@@ -130,6 +143,8 @@ def eval_special_form(h, l, e):
         return cons(h, t)
     elif val == '`':
         return car(l)
+    elif val == 'cond':
+        return eval_cond(l, e)
     return 'OK'
 
 

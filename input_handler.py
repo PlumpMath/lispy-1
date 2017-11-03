@@ -2,7 +2,7 @@ from core import cons, Symbol, EmptyList, BinOp, PredOp, SpecialForm
 
 bin_ops = {'+', '-', '*', '/', '%'}
 pred_ops = {'<', '<=', '>', '>=', '==', '!=', 'and', 'or'}
-spec_forms = {'car', 'cdr', 'cons', 'def', 'defn', 'if', 'lambda', '`'}
+spec_forms = {'car', 'cdr', 'cons', 'def', 'defn', 'if', 'lambda', '`', 'cond'}
 
 
 def check_brackets(string):

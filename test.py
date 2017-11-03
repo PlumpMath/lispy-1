@@ -111,18 +111,26 @@ def test_if():
     assert eval_lisp(parse('(if (< 3 5) (12) (22))'), Env()) == 12
 
 
+def test_cond():
+    e = Env()
+    p = parse('(cond ((< 3 1) 1) ((< 2 3) 2))')
+    assert eval_lisp(p, e) == 2
+
+    print('cond test passed')
+
+
 def test_fib():
     e = Env()
     fib = parse('(def fib (lambda (n) ('
-                'if (< n 2)'
-                ' 1'
-                ' (+ (fib (- n 1)) (fib (- n 2))))'
+                'cond ((== n 1) 1)'
+                ' ((== n 0) 0)'
+                ' (else (+ (fib (- n 1)) (fib (- n 2)))))'
                 '))')
     assert show(
-        fib) == '(def fib (lambda (n ()) (if (< n 2 ()) 1 (+ (fib (- n 1 ()) ()) (fib (- n 2 ()) ()) ()) ()) ()) ())'
+        fib) == '(def fib (lambda (n ()) (cond ((== n 1 ()) (1 ())) ((== n 0 ()) (0 ())) (else (+ (fib (- n 1 ()) ()) (fib (- n 2 ()) ()) ()) ()) ()) ()) ())'
     eval_lisp(fib, e)
     exec_fib = parse('(fib 10)')
-    assert eval_lisp(exec_fib, e) == 89
+    assert eval_lisp(exec_fib, e) == 55
 
 
 def test_simple_coms():
@@ -152,4 +160,5 @@ test_fib()
 test_core()
 input_test()
 test_if()
+test_cond()
 test_simple_coms()
