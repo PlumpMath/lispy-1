@@ -2,7 +2,7 @@ from core import cons, Symbol, EmptyList, BinOp, PredOp, SpecialForm
 
 bin_ops = {'+', '-', '*', '/', '%'}
 pred_ops = {'<', '<=', '>', '>=', '==', '!=', 'and', 'or'}
-spec_forms = {'car', 'cdr', 'cons', 'def', 'defn', 'if', 'lambda'}
+spec_forms = {'car', 'cdr', 'cons', 'def', 'defn', 'if', 'lambda', '`'}
 
 
 def check_brackets(string):
@@ -72,6 +72,8 @@ def tokenize(string):
         return SpecialForm(string)
     elif string[0] == '"':
         return string
+    elif string[0] == '`':
+        return string[1:]
     elif string[0].isalpha():
         return Symbol(string)
     else:

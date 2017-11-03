@@ -108,25 +108,48 @@ def input_test():
 
 
 def test_if():
-    if1 = cons(SpecialForm('if'), cons(cons(PredOp('<'), cons(3,
-                                                              cons(5, EmptyList()))), cons(cons(88, EmptyList()),
-                                                                                           cons(cons(22, EmptyList()),
-                                                                                                EmptyList()))))
-    print(show(if1))
-    print(eval_lisp(parse('(if (< 3 5) (12) (22))'), Env()))
+    assert eval_lisp(parse('(if (< 3 5) (12) (22))'), Env()) == 12
 
 
 def test_fib():
     e = Env()
-    fib = parse('(def fib (lambda (n) (if (< n 2) 1 (+ (fib (- n 1)) (fib (- n 2))))))')
+    fib = parse('(def fib (lambda (n) ('
+                'if (< n 2)'
+                ' 1'
+                ' (+ (fib (- n 1)) (fib (- n 2))))'
+                '))')
     assert show(
         fib) == '(def fib (lambda (n ()) (if (< n 2 ()) 1 (+ (fib (- n 1 ()) ()) (fib (- n 2 ()) ()) ()) ()) ()) ())'
     eval_lisp(fib, e)
-    exec_fib = parse('(fib 20)')
-    assert eval_lisp(exec_fib, e) == 10946
+    exec_fib = parse('(fib 10)')
+    assert eval_lisp(exec_fib, e) == 89
+
+
+def test_simple_coms():
+    e = Env()
+
+    emp = parse('(defn empty? (x) (and (== (car x) None) (== (cdr x) None)))')
+    f = parse('(empty? (` (1 2)))')
+    t = parse('(empty? ())')
+    qua = parse(
+        '(defn qua (x) ('
+        'if (empty? x) '
+        '() '
+        '(cons (* 2 (car x)) (qua (cdr x)))'
+        '))'
+    )
+    q = parse('(qua (qua (` (1 3))))')
+    eval_lisp(emp, e)
+    eval_lisp(qua, e)
+    assert eval_lisp(f, e) == False
+    assert eval_lisp(t, e) == True
+    assert show(eval_lisp(q, e)) == '(4 12 ())'
+
+    print('simple tests passed')
 
 
 test_fib()
 test_core()
 input_test()
 test_if()
+test_simple_coms()

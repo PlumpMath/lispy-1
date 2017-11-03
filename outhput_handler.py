@@ -1,4 +1,5 @@
 from core import is_empty, car, cdr, get_type, get_value, get_env, set_env, def_env, sub_env, Lambda, cons
+from input_handler import parse
 
 
 def show(l, start_of_list=True):
@@ -122,13 +123,13 @@ def eval_special_form(h, l, e):
         h = car(l)
         return eval_lisp(car(eval_lisp(h, e)), e)
     elif val == 'cdr':
-        return cdr(car(l))
+        return cdr(eval_lisp(car(l), e))
     elif val == 'cons':
         h = eval_lisp(car(l), e)
         t = eval_lisp(car(cdr(l)), e)
         return cons(h, t)
-    elif val == 'empty?':
-        return is_empty(car(l))
+    elif val == '`':
+        return car(l)
     return 'OK'
 
 
