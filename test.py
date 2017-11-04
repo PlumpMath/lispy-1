@@ -140,9 +140,9 @@ def test_simple_coms():
     f = parse('(empty? (` (1 2)))')
     t = parse('(empty? ())')
     qua = parse(
-        '(defn qua (x) ('
-        'if (empty? x) '
-        '() '
+        '(defn qua (x)('
+        'if (empty? x)'
+        '()'
         '(cons (* 2 (car x)) (qua (cdr x)))'
         '))'
     )

@@ -26,14 +26,16 @@ def check_brackets(string):
 def pinch_block(string):
     stack = []
     result = 0
+    in_string = False
 
     for i in string:
         result += 1
-
-        if i is '(':
+        if i is '"':
+            in_string = not in_string
+        if i is '(' and not in_string:
             stack.append(i)
 
-        if i is ')':
+        if i is ')' and not in_string:
             if len(stack) == 0:
                 raise Exception('Wrong input!')
 
@@ -45,15 +47,23 @@ def pinch_block(string):
 
 def find_cdr(string):
     in_inner_block = 0
-    in_string = 0
+    in_string = False
+    prev_closed = False
 
     for i, val in enumerate(string):
-        if val == '(':
-            in_inner_block += 1
-        if val == ')':
-            in_inner_block -= 1
-        if val == ' ' and in_inner_block <= 0:
+        if prev_closed and val == '(' and in_inner_block <= 0 and not in_string:
             return i
+        if val == ' ' and in_inner_block <= 0 and not in_string:
+            return i
+        prev_closed = False
+        if val == '(' and not in_string:
+            in_inner_block += 1
+        if val == ')' and not in_string:
+            in_inner_block -= 1
+            prev_closed = True
+        if val == '"':
+            in_string = not in_string
+
     return -1
 
 
