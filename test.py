@@ -164,11 +164,10 @@ def test_macro():
     print(eval_lisp(c, e))
 
 
-# test_fib()
-# test_core()
-# input_test()
-# test_if()
-# test_cond()
-# test_simple_coms()
+test_fib()
+test_core()
+input_test()
+test_if()
+test_cond()
+test_simple_coms()
 test_macro()
-

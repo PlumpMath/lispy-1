@@ -159,6 +159,8 @@ def eval_special_form(h, l, e):
     elif val == 'eval':
         a = eval_lisp(car(l), e)
         return eval_lisp(a, e)
+    elif val == 'typeof':
+        return get_type(car(l))
     return OK_symbol
 
 
