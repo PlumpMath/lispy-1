@@ -140,3 +140,11 @@ class Lambda(LispyCore):
         self.body = body
         self.env = env
         self.type = 'Lambda'
+
+
+class Macro(LispyCore):
+    def __init__(self, args, body):
+        super().__init__(None)
+        self.args = args
+        self.body = body
+        self.type = 'Macro'

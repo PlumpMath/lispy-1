@@ -156,9 +156,19 @@ def test_simple_coms():
     print('simple tests passed')
 
 
-test_fib()
-test_core()
-input_test()
-test_if()
-test_cond()
-test_simple_coms()
+def test_macro():
+    e = Env()
+    p = parse('(def t (macro (x) (+ x x)))')
+    c = parse('(t (+ 1 2))')
+    eval_lisp(p, e)
+    print(eval_lisp(c, e))
+
+
+# test_fib()
+# test_core()
+# input_test()
+# test_if()
+# test_cond()
+# test_simple_coms()
+test_macro()
+

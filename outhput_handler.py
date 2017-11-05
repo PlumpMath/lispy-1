@@ -1,6 +1,7 @@
-from core import is_empty, car, cdr, get_type, get_value, get_env, set_env, def_env, sub_env, Lambda, cons
+from core import is_empty, car, cdr, get_type, get_value, get_env, set_env, def_env, sub_env, Lambda, cons, Macro
 from input_handler import parse
 
+OK_symbol = 'OK'
 
 def show(l, start_of_list=True):
     type = get_type(l)
@@ -124,6 +125,10 @@ def eval_special_form(h, l, e):
         args = car(l)
         body = cdr(l)
         return Lambda(args, body, e)
+    elif val == 'macro':
+        args = car(l)
+        body = cdr(l)
+        return Macro(args, body)
     elif val == 'if':
         pred = eval_lisp(car(l), e)
         t = car(cdr(l))
@@ -145,22 +150,55 @@ def eval_special_form(h, l, e):
         return car(l)
     elif val == 'cond':
         return eval_cond(l, e)
-    return 'OK'
+    elif val == 'print':
+        while not is_empty(l):
+            r = eval_lisp(car(l), e)
+            print(r)
+            l = cdr(l)
+        return OK_symbol
+    elif val == 'eval':
+        a = eval_lisp(car(l), e)
+        return eval_lisp(a, e)
+    return OK_symbol
 
 
-def eval_lambda(head_form, args, e):
-    su = sub_env(head_form.env)
-    sub_args = head_form.args
+def eval_lambda(lmbd, args, e):
+    se = sub_env(lmbd.env)
+    sub_args = lmbd.args
     while not is_empty(sub_args):
         if is_empty(args):
             raise Exception('not enough args!')
         arg = eval_lisp(car(args), e)
-        k = eval_lisp(car(sub_args), su)
-        def_env(su, k, arg)
+        k = eval_lisp(car(sub_args), se)
+        def_env(se, k, arg)
         sub_args = cdr(sub_args)
         args = cdr(args)
-    body = head_form.body
-    return eval_lisp(body, su)
+    body = lmbd.body
+    return eval_lisp(body, se)
+
+
+def macro_expand(body, e):
+    type = get_type(body)
+    if type == 'ConsList':
+        return cons(macro_expand(car(body), e), macro_expand(cdr(body), e))
+    if type == 'Symbol':
+        return eval_symbol(body, e)
+    return body
+
+
+def eval_macro(mcr, args, e):
+    sub_args = mcr.args
+    se = sub_env(e)
+    while not is_empty(sub_args):
+        if is_empty(args):
+            raise Exception('not enough args!')
+        arg = car(args)
+        k = get_value(car(sub_args))
+        def_env(se, k, arg)
+        sub_args = cdr(sub_args)
+        args = cdr(args)
+    body = macro_expand(mcr.body, se)
+    return eval_lisp(body, e)
 
 
 def eval_symbol(s, e):
@@ -177,6 +215,8 @@ def eval_lisp(l, e):
         if is_empty(l):
             return l
         head_form = eval_lisp(car(l), e)
+        if head_form == OK_symbol:
+            return eval_lisp(cdr(l), e)
         head_form_type = get_type(head_form)
         if head_form_type == 'BinOp':
             return eval_bin_op(head_form, cdr(l), e)
@@ -188,6 +228,8 @@ def eval_lisp(l, e):
             return eval_symbol(head_form, e)
         if head_form_type == 'Lambda':
             return eval_lambda(head_form, cdr(l), e)
+        if head_form_type == 'Macro':
+            return eval_macro(head_form, cdr(l), e)
         return head_form
     if type == 'Symbol':
         if get_value(l) == 'None':
