@@ -149,8 +149,8 @@ def test_simple_coms():
     q = parse('(qua (qua (` (1 3))))')
     eval_lisp(emp, e)
     eval_lisp(qua, e)
-    assert eval_lisp(f, e) == False
-    assert eval_lisp(t, e) == True
+    assert not eval_lisp(f, e)
+    assert eval_lisp(t, e)
     assert show(eval_lisp(q, e)) == '(4 12 ())'
 
     print('simple tests passed')
@@ -164,6 +164,26 @@ def test_macro():
     print(eval_lisp(c, e))
 
 
+def test_high_order_func():
+    e = Env()
+    p = parse('(defn a (x)'
+              ' ((defn g (z) (+ z x)) g)'
+              ')')
+    eval_lisp(p, e)
+    c = parse('((a 7) 3)')
+    assert eval_lisp(c, e) == 10
+
+    e = Env()
+    p = parse('(defn a (x)'
+              ' ((defn g () (+ 3 x)) g)'
+              ')')
+    eval_lisp(p, e)
+    c = parse('((a 1))')
+    print(eval_lisp(c, e))
+
+
+
+
 test_fib()
 test_core()
 input_test()
@@ -171,3 +191,4 @@ test_if()
 test_cond()
 test_simple_coms()
 test_macro()
+test_high_order_func()

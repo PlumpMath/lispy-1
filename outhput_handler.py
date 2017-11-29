@@ -165,6 +165,8 @@ def eval_special_form(h, l, e):
 
 
 def eval_lambda(lmbd, args, e):
+    if is_empty(args):
+        return lmbd
     se = sub_env(lmbd.env)
     sub_args = lmbd.args
     while not is_empty(sub_args):
@@ -216,22 +218,31 @@ def eval_lisp(l, e):
     if type == 'ConsList':
         if is_empty(l):
             return l
+
         head_form = eval_lisp(car(l), e)
+        tail = cdr(l)
         if head_form == OK_symbol:
-            return eval_lisp(cdr(l), e)
+            res = eval_lisp(tail, e)
+            return res
         head_form_type = get_type(head_form)
         if head_form_type == 'BinOp':
-            return eval_bin_op(head_form, cdr(l), e)
+            res = eval_bin_op(head_form, tail, e)
+            return res
         if head_form_type == 'PredOp':
-            return eval_pred_op(head_form, cdr(l), e)
+            res = eval_pred_op(head_form, tail, e)
+            return res
         if head_form_type == 'SpecialForm':
-            return eval_special_form(head_form, cdr(l), e)
+            res = eval_special_form(head_form, tail, e)
+            return res
         if head_form_type == 'Symbol':
-            return eval_symbol(head_form, e)
+            res = eval_symbol(head_form, e)
+            return res
         if head_form_type == 'Lambda':
-            return eval_lambda(head_form, cdr(l), e)
+            res = eval_lambda(head_form, tail, e)
+            return res
         if head_form_type == 'Macro':
-            return eval_macro(head_form, cdr(l), e)
+            res = eval_macro(head_form, tail, e)
+            return res
         return head_form
     if type == 'Symbol':
         if get_value(l) == 'None':

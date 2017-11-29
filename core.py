@@ -57,6 +57,12 @@ class ConsList:
     def get_type(self):
         return self.type
 
+    def __repr__(self):
+        return '({} {})'.format(self.v1, self.v2)
+
+    def __str__(self):
+        return self.__repr__()
+
 
 class EmptyList:
     instance = None
@@ -72,7 +78,7 @@ class EmptyList:
         return repr(self)
 
     def __repr__(self):
-        return 'empty list.'
+        return '()'
 
 
 class Symbol(LispyCore):
@@ -80,17 +86,35 @@ class Symbol(LispyCore):
         super().__init__(v)
         self.type = 'Symbol'
 
+    def __str__(self):
+        return repr(self)
+
+    def __repr__(self):
+        return '{}'.format(self.value)
+
 
 class PredOp(LispyCore):
     def __init__(self, v):
         super().__init__(v)
         self.type = 'PredOp'
 
+    def __str__(self):
+        return repr(self)
+
+    def __repr__(self):
+        return '{}'.format(self.value)
+
 
 class BinOp(LispyCore):
     def __init__(self, v):
         super().__init__(v)
         self.type = 'BinOp'
+
+    def __str__(self):
+        return repr(self)
+
+    def __repr__(self):
+        return '{}'.format(self.value)
 
 
 class Env:
@@ -132,6 +156,12 @@ class SpecialForm(LispyCore):
         super().__init__(v)
         self.type = 'SpecialForm'
 
+    def __str__(self):
+        return repr(self)
+
+    def __repr__(self):
+        return '{}'.format(self.value)
+
 
 class Lambda(LispyCore):
     def __init__(self, args, body, env):
@@ -140,6 +170,12 @@ class Lambda(LispyCore):
         self.body = body
         self.env = env
         self.type = 'Lambda'
+
+    def __str__(self):
+        return repr(self)
+
+    def __repr__(self):
+        return 'Lambda {} {}'.format(self.args, self.body)
 
 
 class Macro(LispyCore):
