@@ -165,10 +165,10 @@ def eval_special_form(h, l, e):
 
 
 def eval_lambda(lmbd, args, e):
-    if is_empty(args):
-        return lmbd
     se = sub_env(lmbd.env)
     sub_args = lmbd.args
+    if not is_empty(sub_args) and is_empty(args):
+        return lmbd
     while not is_empty(sub_args):
         if is_empty(args):
             raise Exception('not enough args!')

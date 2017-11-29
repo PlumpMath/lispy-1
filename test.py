@@ -130,6 +130,7 @@ def test_fib():
         fib) == '(def fib (lambda (n ()) (cond ((== n 1 ()) (1 ())) ((== n 0 ()) (0 ())) (else (+ (fib (- n 1 ()) ()) (fib (- n 2 ()) ()) ()) ()) ()) ()) ())'
     eval_lisp(fib, e)
     exec_fib = parse('(fib 10)')
+    print(eval_lisp(exec_fib, e))
     assert eval_lisp(exec_fib, e) == 55
 
 
@@ -161,7 +162,7 @@ def test_macro():
     p = parse('(def t (macro (x) (+ x x)))')
     c = parse('(t (+ 1 2))')
     eval_lisp(p, e)
-    print(eval_lisp(c, e))
+    assert eval_lisp(c, e) == 6
 
 
 def test_high_order_func():
@@ -178,10 +179,8 @@ def test_high_order_func():
               ' ((defn g () (+ 3 x)) g)'
               ')')
     eval_lisp(p, e)
-    c = parse('((a 1))')
-    print(eval_lisp(c, e))
-
-
+    c = parse('a 1')
+    assert eval_lisp(c, e) == 4
 
 
 test_fib()
