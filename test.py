@@ -57,22 +57,22 @@ def test_core():
 
     e = Env()
     assert eval_lisp(l5, e) == 11, 'eval l5 not passed'
-    assert eval_lisp(l6, e) == True, 'eval l6 not passed'
-    assert eval_lisp(l7, e) == False, 'eval l7 not passed'
-    assert eval_lisp(l8, e) == True, 'eval l8 not passed'
-    assert eval_lisp(l9, e) == False, 'eval l9 not passed'
-    assert eval_lisp(l10, e) == False, 'eval l10 not passed'
-    assert eval_lisp(l11, e) == True, 'eval l11 not passed'
-    assert eval_lisp(l12, e) == True, 'eval l12 not passed'
+    assert eval_lisp(l6, e), 'eval l6 not passed'
+    assert not eval_lisp(l7, e), 'eval l7 not passed'
+    assert eval_lisp(l8, e), 'eval l8 not passed'
+    assert not eval_lisp(l9, e), 'eval l9 not passed'
+    assert not eval_lisp(l10, e), 'eval l10 not passed'
+    assert eval_lisp(l11, e), 'eval l11 not passed'
+    assert eval_lisp(l12, e), 'eval l12 not passed'
     assert eval_lisp(l13, e) == 50, 'eval l13 not passed'
     assert eval_lisp(l14, e) == 'OK', 'eval l14 not passed'
     assert eval_lisp(l15, e) == 3, 'eval l15 not passed'
     assert eval_lisp(l16, e) == 'OK', 'eval l16 not passed'
     assert eval_lisp(l17, e) == 'asd', 'eval l17 not passed'
     assert eval_lisp(l18, e) == 8, 'eval l18 not passed'
-    assert eval_lisp(pre1, e) == False, 'eval pre1 not passed'
-    assert eval_lisp(pre2, e) == False, 'eval pre2 not passed'
-    assert eval_lisp(pre3, e) == False, 'eval pre3 not passed'
+    assert not eval_lisp(pre1, e), 'eval pre1 not passed'
+    assert not eval_lisp(pre2, e), 'eval pre2 not passed'
+    assert not eval_lisp(pre3, e), 'eval pre3 not passed'
 
     print('eval tests passed')
     print('core tests passed')
@@ -130,7 +130,6 @@ def test_fib():
         fib) == '(def fib (lambda (n ()) (cond ((== n 1 ()) (1 ())) ((== n 0 ()) (0 ())) (else (+ (fib (- n 1 ()) ()) (fib (- n 2 ()) ()) ()) ()) ()) ()) ())'
     eval_lisp(fib, e)
     exec_fib = parse('(fib 10)')
-    print(eval_lisp(exec_fib, e))
     assert eval_lisp(exec_fib, e) == 55
 
 
@@ -164,11 +163,13 @@ def test_macro():
     eval_lisp(p, e)
     assert eval_lisp(c, e) == 6
 
+    print('macro passed')
+
 
 def test_high_order_func():
     e = Env()
     p = parse('(defn a (x)'
-              ' ((defn g (z) (+ z x)) g)'
+              ' ((defn g (z) (+ z x)) (` g))'
               ')')
     eval_lisp(p, e)
     c = parse('((a 7) 3)')
@@ -176,11 +177,33 @@ def test_high_order_func():
 
     e = Env()
     p = parse('(defn a (x)'
-              ' ((defn g () (+ 3 x)) g)'
+              ' ((defn g () (+ 3 x)) (` g))'
               ')')
     eval_lisp(p, e)
-    c = parse('a 1')
+    c = parse('((a 1))')
     assert eval_lisp(c, e) == 4
+
+    print('high order passed')
+
+
+def test_quote():
+    e = Env()
+    p = parse('(defn a (x)'
+              ' ((defn g (z) (+ z x)) (` g))'
+              ')')
+    eval_lisp(p, e)
+    c = parse('((a 7) 3)')
+    assert eval_lisp(c, e) == 10
+
+    e = Env()
+    p = parse('(defn a (x)'
+              ' ((defn g (z) (+ z x)) `g)'
+              ')')
+    eval_lisp(p, e)
+    c = parse('((a 7) 3)')
+    assert eval_lisp(c, e) == 10
+
+    print('quote passed')
 
 
 test_fib()
@@ -191,3 +214,4 @@ test_cond()
 test_simple_coms()
 test_macro()
 test_high_order_func()
+test_quote()

@@ -1,7 +1,7 @@
 from core import is_empty, car, cdr, get_type, get_value, get_env, set_env, def_env, sub_env, Lambda, cons, Macro
-from input_handler import parse
 
 OK_symbol = 'OK'
+
 
 def show(l, start_of_list=True):
     type = get_type(l)
@@ -167,8 +167,6 @@ def eval_special_form(h, l, e):
 def eval_lambda(lmbd, args, e):
     se = sub_env(lmbd.env)
     sub_args = lmbd.args
-    if not is_empty(sub_args) and is_empty(args):
-        return lmbd
     while not is_empty(sub_args):
         if is_empty(args):
             raise Exception('not enough args!')

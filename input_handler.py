@@ -115,6 +115,11 @@ def parse(string, level=0):
             cdr_tok = parse(string[cdr_ind:], level)
             return cons(car_tok, cdr_tok)
         else:
-            car_tok = tokenize(string)
-            cdr_tok = EmptyList()
-            return cons(car_tok, cdr_tok)
+            if string[0] == '`':
+                car_tok = tokenize(string[0])
+                cdr_tok = parse(string[1:], level)
+                return cons(cons(car_tok, cdr_tok), EmptyList())
+            else:
+                car_tok = tokenize(string)
+                cdr_tok = EmptyList()
+                return cons(car_tok, cdr_tok)

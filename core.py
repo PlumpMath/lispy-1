@@ -90,7 +90,7 @@ class Symbol(LispyCore):
         return repr(self)
 
     def __repr__(self):
-        return '{}'.format(self.value)
+        return 'sym:{}'.format(self.value)
 
 
 class PredOp(LispyCore):
@@ -175,7 +175,7 @@ class Lambda(LispyCore):
         return repr(self)
 
     def __repr__(self):
-        return 'Lambda {} {}'.format(self.args, self.body)
+        return 'Lambda [{}] {}'.format(self.args, self.body)
 
 
 class Macro(LispyCore):
